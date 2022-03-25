@@ -33,6 +33,7 @@ namespace GameServer.Services
 
             NetMessage message = new NetMessage();
             message.Response = new NetMessageResponse();
+
             message.Response.userRegister = new UserRegisterResponse();
             //message.Request.userRegister = 
             //message.Response.firsetTestRegister = new FirstTestResponse();

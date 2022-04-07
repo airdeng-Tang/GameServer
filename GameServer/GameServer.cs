@@ -23,9 +23,11 @@ namespace GameServer
 
         public bool Init()
         {
-            //int Port = Properties.Settings.Default.ServerPort;
+            //此配置为C#特有  右键项目名->属性->设置 处配置  代码体现于App.config中<userSettings>处
+            int Port = Properties.Settings.Default.ServerPort;
+
             network = new NetService();
-            network.Init(8000);
+            network.Init(Port);
             //在类名后面加上:Singleton<>时则调用方法时不需要new仅需要在类名后接Instance(全局对象)接方法即可
             //参考:https://zhidao.baidu.com/question/1510467911375124700.html
             HelloWorldService.Instance.Init();//初始化服务 HelloWorldService

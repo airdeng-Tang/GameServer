@@ -24,5 +24,10 @@ namespace GameServer
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TCharacter> Characters { get; set; }
+
+        public static implicit operator TPlayer(int v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

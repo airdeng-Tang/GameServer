@@ -1,4 +1,5 @@
 ﻿using Common;
+using GameServer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GameServer.Managers
 {
-    class MapManager : Singleton<CharacterManager>
+    class MapManager : Singleton<MapManager>
     {
         Dictionary<int, Map> Maps = new Dictionary<int, Map>();
 
@@ -16,7 +17,7 @@ namespace GameServer.Managers
             foreach(var mapdefine in DataManager.Instance.Maps.Values)
             {
                 Map map = new Map(mapdefine);
-                Log.InfoFormat("MapManager.Init => Map:{0} : {1}",map.Define.Id, map.Define.Name);
+                Log.InfoFormat("MapManager.Init => Map:{0} : {1}",map.Define.ID, map.Define.Name);
                 this.Maps[mapdefine.ID] = map;
             }
         }

@@ -11,6 +11,7 @@ using System.Threading;
 
 using Network;
 using GameServer.Services;
+using GameServer.Managers;
 
 namespace GameServer
 {
@@ -33,6 +34,8 @@ namespace GameServer
             HelloWorldService.Instance.Init();//初始化服务 HelloWorldService
             DBService.Instance.Init();
             UserService.Instance.Init();
+            DataManager.Instance.Load();
+            MapManager.Instance.Init();
             //user.Init();
             thread = new Thread(new ThreadStart(this.Update));
 

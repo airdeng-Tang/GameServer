@@ -50,7 +50,7 @@ namespace GameServer.Models
         internal void CharacterEnter(NetConnection<NetSession> conn, Character character)
         {
             Log.InfoFormat("地图与角色信息=>CharacterEnter: Map: {0}  characterId:{1}", this.Define.ID, character.Id);
-
+            
             character.Info.mapId = this.ID;
 
             NetMessage message = new NetMessage();
@@ -64,11 +64,14 @@ namespace GameServer.Models
             foreach(var kv in this.MapCharacters)
             {
                 message.Response.mapCharacterEnter.Characters.Add(kv.Value.character.Info);
-                this.SendCharacterEnterMap(kv.Value.connection, character.Info);
+                if (kv.Value.character != character)
+                    this.SendCharacterEnterMap(kv.Value.connection, character.Info);
             }
+            Log.InfoFormat("添加前地图中玩家总数为:  {0}", this.MapCharacters.Count());
             //创建将玩家信息添加至地图
             this.MapCharacters[character.Id] = new MapCharacter(conn, character);
-
+            
+            Log.InfoFormat("添加后地图中玩家总数为:  {0}", this.MapCharacters.Count());
             byte[] data = PackageHandler.PackMessage(message);
             conn.SendData(data,0,data.Length);
         }
@@ -84,14 +87,14 @@ namespace GameServer.Models
 
         void SendCharacterEnterMap(NetConnection<NetSession> conn, NCharacterInfo character)
         {
-            Log.InfoFormat("遍历地图现有玩家 :: characterId:{0}", character.Id);
+            Log.InfoFormat("进入地图玩家id为 :: characterId:{0}", character.Id);
             NetMessage message = new NetMessage();
             message.Response = new NetMessageResponse();
 
             message.Response.mapCharacterEnter = new MapCharacterEnterResponse();
             message.Response.mapCharacterEnter.mapId = this.Define.ID;
             message.Response.mapCharacterEnter.Characters.Add(character);
-
+            
             byte[] data = PackageHandler.PackMessage(message);
             conn.SendData(data, 0,data.Length);
         }

@@ -1,6 +1,7 @@
 ﻿using Common;
 using Common.Data;
 using GameServer.Entities;
+using GameServer.Services;
 using Network;
 using SkillBridge.Message;
 using System;
@@ -79,10 +80,11 @@ namespace GameServer.Models
         internal void CharacterLeave(NCharacterInfo cha)
         {
             Log.InfoFormat("CharacterLeave: Map{0} ; characterId:{1}", this.Define, cha.Id);
-            this.MapCharacters.Remove(cha.Id); 
+            
             foreach(var kv in this.MapCharacters){
                 this.SendCharacterLeaveMap(kv.Value.connection, cha);
             }
+            this.MapCharacters.Remove(cha.Id);
         }
 
         void SendCharacterEnterMap(NetConnection<NetSession> conn, NCharacterInfo character)
@@ -110,16 +112,34 @@ namespace GameServer.Models
             byte[] data = PackageHandler.PackMessage(message);
             conn.SendData(data, 0, data.Length);
         }
-        
+
         //internal void UpdataEntity(NEntitySync entity)
         //{
         //    foreach(var ky in this.MapCharacters)
         //    {
         //        if(ky.Value.character == entity.Id)
         //        {
-                    
+
         //        }
         //    }
         //}
+
+
+        internal void UpdateEntity(NEntitySync entity)
+        {
+            foreach(var kv in this.MapCharacters)
+            {
+                if(kv.Value.character.entityId == entity.Id)
+                {
+                    kv.Value.character.Position = entity.Entity.Position;
+                    kv.Value.character.Direction = entity.Entity.Direction;
+                    kv.Value.character.Speed = entity.Entity.Speed;
+                }
+                else
+                {
+                    MapService.Instance.SendEntityUpdate(kv.Value.connection, entity);
+                }
+            }
+        }
     }
 }

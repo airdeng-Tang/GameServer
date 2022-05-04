@@ -120,9 +120,6 @@ namespace GameServer.Services
             Log.InfoFormat("角色创建:: 角色名称: {0}   角色职业: {1}", request.Name, request.Class);
 
 
-            NetMessage message = new NetMessage();
-            message.Response = new NetMessageResponse();
-            message.Response.createChar = new UserCreateCharacterResponse();
 
             TCharacter character = new TCharacter()
             {
@@ -136,14 +133,15 @@ namespace GameServer.Services
                 //Player = player
             };
 
-            DBService.Instance.Entities.Characters.Add(character);
+            character = DBService.Instance.Entities.Characters.Add(character);
             //将数据保存在Session中以减少服务器压力
             sender.Session.User.Player.Characters.Add(character);
-
-
             //SaveChange()任何数据库操作都要在完成后调用此方法
             DBService.Instance.Entities.SaveChanges();
 
+            NetMessage message = new NetMessage();
+            message.Response = new NetMessageResponse();
+            message.Response.createChar = new UserCreateCharacterResponse();
             message.Response.createChar.Result = Result.Success;
             message.Response.createChar.Errormsg = "None";
 

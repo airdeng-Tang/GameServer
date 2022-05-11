@@ -61,11 +61,11 @@ namespace GameServer.Models
             message.Response.mapCharacterEnter.mapId = this.Define.ID;
             message.Response.mapCharacterEnter.Characters.Add(character.Info);
             
-            //遍历地图中玩家将自身信息发送给其他玩家
+            //遍历地图中玩家
             foreach(var kv in this.MapCharacters)
             {
-                message.Response.mapCharacterEnter.Characters.Add(kv.Value.character.Info);
-                if (kv.Value.character != character)
+                message.Response.mapCharacterEnter.Characters.Add(kv.Value.character.Info);//将地图中的玩家同步给登陆玩家
+                if (kv.Value.character != character)//将自身信息发送给其他玩家
                     this.SendCharacterEnterMap(kv.Value.connection, character.Info);
             }
             Log.InfoFormat("添加前地图中玩家总数为:  {0}", this.MapCharacters.Count());
@@ -77,14 +77,15 @@ namespace GameServer.Models
             conn.SendData(data,0,data.Length);
         }
 
-        internal void CharacterLeave(NCharacterInfo cha)
+        internal void CharacterLeave(Character cha)
         {
             Log.InfoFormat("CharacterLeave: Map{0} ; characterId:{1}", this.Define, cha.Id);
-            
-            foreach(var kv in this.MapCharacters){
+            Log.InfoFormat("退出  {0}  前玩家总数为:  {1}", cha.Id, this.MapCharacters.Count());
+            foreach (var kv in this.MapCharacters){
                 this.SendCharacterLeaveMap(kv.Value.connection, cha);
             }
             this.MapCharacters.Remove(cha.Id);
+            Log.InfoFormat("退出  {0}  后玩家总数为:  {1}",cha.Id, this.MapCharacters.Count());
         }
 
         void SendCharacterEnterMap(NetConnection<NetSession> conn, NCharacterInfo character)
@@ -101,7 +102,7 @@ namespace GameServer.Models
             conn.SendData(data, 0,data.Length);
         }
 
-        void SendCharacterLeaveMap(NetConnection<NetSession> conn, NCharacterInfo character)
+        void SendCharacterLeaveMap(NetConnection<NetSession> conn, Character character)
         {
             NetMessage message = new NetMessage();
             message.Response = new NetMessageResponse();

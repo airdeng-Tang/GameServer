@@ -171,7 +171,8 @@ namespace GameServer.Services
             message.Response = new NetMessageResponse();
             message.Response.gameEnter= new UserGameEnterResponse();
             message.Response.gameEnter.Result = Result.Success;
-            message.Response.gameEnter.Errormsg = "None";   
+            message.Response.gameEnter.Errormsg = "None";
+            message.Response.gameEnter.Character = character.Info;
 
             byte[] data = PackageHandler.PackMessage(message);
             sender.SendData(data, 0, data.Length);

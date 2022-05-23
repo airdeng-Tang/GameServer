@@ -20,11 +20,11 @@ public partial class TCharacterItem
 
     public int Id { get; set; }
 
-    public int ItemId { get; set; }
+    public int ItemID { get; set; }
 
     public int ItemCount { get; set; }
 
-    public int TCharacterID { get; set; }
+    public int CharacterID { get; set; }
 
 
 

@@ -24,6 +24,8 @@ public partial class TCharacter
 
         this.MapID = 1;
 
+        this.Gold = 0;
+
         this.Items = new HashSet<TCharacterItem>();
 
     }

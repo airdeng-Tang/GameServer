@@ -188,7 +188,7 @@
           <Property Name="MapPosZ" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Items" Relationship="ExtremeWorldModel.CharacterItem" FromRole="TCharacter" ToRole="TCharacterItem" />
           <NavigationProperty Name="Bag" Relationship="ExtremeWorldModel.Owner" FromRole="TCharacter" ToRole="TCharacterBag" />
-          <Property Name="Gold" Type="Int64" Nullable="false" />
+          <Property Name="Gold" Type="Int64" Nullable="false" DefaultValue="0" />
         </EntityType>
         <Association Name="PlayerCharacter">
           <End Type="ExtremeWorldModel.TPlayer" Role="Player" Multiplicity="1" />

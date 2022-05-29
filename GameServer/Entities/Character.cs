@@ -25,7 +25,7 @@ namespace GameServer.Entities
         public Character(CharacterType type,TCharacter cha):
             base(new Core.Vector3Int(cha.MapPosX, cha.MapPosY, cha.MapPosZ),new Core.Vector3Int(100,0,0))//初始化角色位置和面对的方向
         {
-            this.Data = cha;
+            this.Data = cha; 
             this.Info = new NCharacterInfo();
             this.Info.Type = type;
             this.Info.Id = cha.ID;
@@ -39,6 +39,10 @@ namespace GameServer.Entities
 
             this.ItemManager = new ItemManager(this);
             this.ItemManager.GetItemInfos(this.Info.Items);
+
+            this.Info.Bag = new NBagInfo();
+            this.Info.Bag.Unlocked = this.Data.Bag.Unlocked;
+            this.Info.Bag.Items = this.Data.Bag.Items;
         }
     }
 }

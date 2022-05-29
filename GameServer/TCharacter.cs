@@ -45,6 +45,8 @@ public partial class TCharacter
 
     public int MapPosZ { get; set; }
 
+    public long Gold { get; set; }
+
 
 
     public virtual TPlayer Player { get; set; }
@@ -52,6 +54,8 @@ public partial class TCharacter
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 
     public virtual ICollection<TCharacterItem> Items { get; set; }
+
+    public virtual TCharacterBag Bag { get; set; }
 
 }
 

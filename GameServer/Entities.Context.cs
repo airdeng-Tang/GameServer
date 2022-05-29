@@ -40,6 +40,8 @@ public partial class ExtremeWorldEntities : DbContext
 
     public virtual DbSet<TCharacterItem> CharacterItems { get; set; }
 
+    public virtual DbSet<TCharacterBag> CharacterBags { get; set; }
+
 }
 
 }

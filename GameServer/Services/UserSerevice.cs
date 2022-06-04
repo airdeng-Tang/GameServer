@@ -130,6 +130,7 @@ namespace GameServer.Services
                 MapPosY = 4000,
                 MapPosZ = 820,
                 //Player = player
+                Gold = 100000,
             };
             var bag = new TCharacterBag();
             bag.Owner = character;

@@ -22,7 +22,7 @@ namespace GameServer.Services
             entities = new ExtremeWorldEntities();
         }
 
-        float time = 0;
+        //float time = 0;
         public void Save()
         {
             //DateTime.Now.Ticks - time > xxxx    //相隔xxxx秒执行一次

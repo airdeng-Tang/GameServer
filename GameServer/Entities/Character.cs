@@ -16,6 +16,7 @@ namespace GameServer.Entities
         public TCharacter Data;
 
         public ItemManager ItemManager;
+        public StatusManager StatusManager;
 
         //public int Id//一定注意!!!自己加  使Map.cs创建添加角色时调用的Character.Id不为0,否则创建角色时因为id冲突只能创建一个
         //{
@@ -34,6 +35,7 @@ namespace GameServer.Entities
             this.Info.Tid = cha.TID;
             this.Info.Class = (CharacterClass)cha.Class;
             this.Info.mapId = cha.MapID;
+            this.Info.Gold = cha.Gold;
             this.Info.Entity = this.EntityData;
             this.Define = DataManager.Instance.Characters[this.Info.Tid];
 
@@ -43,6 +45,22 @@ namespace GameServer.Entities
             this.Info.Bag = new NBagInfo();
             this.Info.Bag.Unlocked = this.Data.Bag.Unlocked;
             this.Info.Bag.Items = this.Data.Bag.Items;
+            this.StatusManager = new StatusManager(this);
+
+        }
+
+        public long Gold
+        {
+            get { return this.Data.Gold; }
+            set
+            {
+                if (this.Data.Gold == value)
+                {
+                    return;
+                }
+                this.StatusManager.AddGoldChange((int)(value - this.Data.Gold));
+                this.Data.Gold = value;
+            }
         }
     }
 }

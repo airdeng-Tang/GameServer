@@ -131,6 +131,7 @@ namespace GameServer.Services
                 MapPosZ = 820,
                 //Player = player
                 Gold = 100000,
+                Equips = new byte[28],
             };
             var bag = new TCharacterBag();
             bag.Owner = character;
@@ -140,6 +141,20 @@ namespace GameServer.Services
             character.Bag = DBService.Instance.Entities.CharacterBags.Add(bag);
 
             character = DBService.Instance.Entities.Characters.Add(character);
+
+            character.Items.Add(new TCharacterItem()
+            {
+                Owner = character,
+                ItemID = 1,
+                ItemCount = 20,
+            });
+            character.Items.Add(new TCharacterItem()
+            {
+                Owner = character,
+                ItemID = 2,
+                ItemCount = 20,
+            });
+
             //将数据保存在Session中以减少服务器压力
             sender.Session.User.Player.Characters.Add(character);
             //SaveChange()任何数据库操作都要在完成后调用此方法
@@ -183,24 +198,24 @@ namespace GameServer.Services
 
 
             ///道具系统测试
-            int itemId = 2;
-            bool hasItem = character.ItemManager.HasItem(itemId);
-            Log.InfoFormat("HasItem: [{0}] {1}", itemId, hasItem);
-            if (hasItem)
-            {
-                //character.ItemManager.RemoveItem(itemId, 1);
+            //int itemId = 2;
+            //bool hasItem = character.ItemManager.HasItem(itemId);
+            //Log.InfoFormat("HasItem: [{0}] {1}", itemId, hasItem);
+            //if (hasItem)
+            //{
+            //    //character.ItemManager.RemoveItem(itemId, 1);
 
-            }
-            else
-            {
-                character.ItemManager.AddItem(1, 200);
-                character.ItemManager.AddItem(2, 100);
-                character.ItemManager.AddItem(3, 30);
-                character.ItemManager.AddItem(4, 120);
-            }
-            Models.Item item = character.ItemManager.GetItem(itemId);
-            Log.InfoFormat("<==============>Item: [{0}] [{1}]", itemId, item);
-            DBService.Instance.Save();
+            //}
+            //else
+            //{
+            //    character.ItemManager.AddItem(1, 200);
+            //    character.ItemManager.AddItem(2, 100);
+            //    character.ItemManager.AddItem(3, 30);
+            //    character.ItemManager.AddItem(4, 120);
+            //}
+            //Models.Item item = character.ItemManager.GetItem(itemId);
+            //Log.InfoFormat("<==============>Item: [{0}] [{1}]", itemId, item);
+            //DBService.Instance.Save();
             ///测试end
 
 

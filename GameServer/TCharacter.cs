@@ -49,6 +49,8 @@ public partial class TCharacter
 
     public long Gold { get; set; }
 
+    public byte[] Equips { get; set; }
+
 
 
     public virtual TPlayer Player { get; set; }

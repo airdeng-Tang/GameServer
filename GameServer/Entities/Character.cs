@@ -16,6 +16,7 @@ namespace GameServer.Entities
         public TCharacter Data;
 
         public ItemManager ItemManager;
+        public QuestManager QuestManager;
         public StatusManager StatusManager;
 
         //public int Id//一定注意!!!自己加  使Map.cs创建添加角色时调用的Character.Id不为0,否则创建角色时因为id冲突只能创建一个
@@ -31,7 +32,7 @@ namespace GameServer.Entities
             this.Info.Type = type;
             this.Info.Id = cha.ID;
             this.Info.Name = cha.Name;
-            this.Info.Level = 1;//cha.Level;
+            this.Info.Level = 10;//cha.Level;
             this.Info.Tid = cha.TID;
             this.Info.Class = (CharacterClass)cha.Class;
             this.Info.mapId = cha.MapID;
@@ -47,6 +48,9 @@ namespace GameServer.Entities
             this.Info.Bag.Items = this.Data.Bag.Items;
 
             this.Info.Equips = this.Data.Equips;
+
+            this.QuestManager = new QuestManager(this);
+            this.QuestManager.GetQuestInfos(this.Info.Quests);
 
             this.StatusManager = new StatusManager(this);
 

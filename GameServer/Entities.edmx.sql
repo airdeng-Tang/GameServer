@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 06/04/2022 21:16:31
+-- Date Created: 06/12/2022 16:34:49
 -- Generated from EDMX file: E:\VipMmoRpg\mmorpg-25343cea276fd4e93f3a57f9ca1cf2291e688e4a\Src\Server\GameServer\GameServer\Entities.edmx
 -- --------------------------------------------------
 
@@ -104,6 +104,18 @@ CREATE TABLE [dbo].[CharacterBags] (
 );
 GO
 
+-- Creating table 'CharacterQuests'
+CREATE TABLE [dbo].[CharacterQuests] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [TCharacterID] int  NOT NULL,
+    [QuestID] int  NOT NULL,
+    [Target1] int  NOT NULL,
+    [Target2] int  NOT NULL,
+    [Target3] int  NOT NULL,
+    [Status] int  NOT NULL
+);
+GO
+
 -- --------------------------------------------------
 -- Creating all PRIMARY KEY constraints
 -- --------------------------------------------------
@@ -135,6 +147,12 @@ GO
 -- Creating primary key on [Id] in table 'CharacterBags'
 ALTER TABLE [dbo].[CharacterBags]
 ADD CONSTRAINT [PK_CharacterBags]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+GO
+
+-- Creating primary key on [Id] in table 'CharacterQuests'
+ALTER TABLE [dbo].[CharacterQuests]
+ADD CONSTRAINT [PK_CharacterQuests]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -200,6 +218,21 @@ GO
 CREATE INDEX [IX_FK_Owner]
 ON [dbo].[CharacterBags]
     ([Owner_ID]);
+GO
+
+-- Creating foreign key on [TCharacterID] in table 'CharacterQuests'
+ALTER TABLE [dbo].[CharacterQuests]
+ADD CONSTRAINT [FK_TCharacterTCharacterQuest]
+    FOREIGN KEY ([TCharacterID])
+    REFERENCES [dbo].[Characters]
+        ([ID])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_TCharacterTCharacterQuest'
+CREATE INDEX [IX_FK_TCharacterTCharacterQuest]
+ON [dbo].[CharacterQuests]
+    ([TCharacterID]);
 GO
 
 -- --------------------------------------------------

@@ -44,6 +44,8 @@ public partial class ExtremeWorldEntities : DbContext
 
     public virtual DbSet<TCharacterQuest> CharacterQuests { get; set; }
 
+    public virtual DbSet<TCharacterFriend> CharacterFriends { get; set; }
+
 }
 
 }

@@ -30,6 +30,8 @@ public partial class TCharacter
 
         this.Quests = new HashSet<TCharacterQuest>();
 
+        this.Friends = new HashSet<TCharacterFriend>();
+
     }
 
 
@@ -53,6 +55,10 @@ public partial class TCharacter
 
     public byte[] Equips { get; set; }
 
+    public int Level { get; set; }
+
+    public long Exp { get; set; }
+
 
 
     public virtual TPlayer Player { get; set; }
@@ -66,6 +72,10 @@ public partial class TCharacter
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 
     public virtual ICollection<TCharacterQuest> Quests { get; set; }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+    public virtual ICollection<TCharacterFriend> Friends { get; set; }
 
 }
 

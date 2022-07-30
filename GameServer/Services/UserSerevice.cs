@@ -136,7 +136,7 @@ namespace GameServer.Services
                     foreach(var c in user.Player.Characters)
                     {
                         NCharacterInfo cInfo = new NCharacterInfo();
-                        cInfo.Tid = c.ID;
+                        cInfo.ConfigId = c.ID;
 
                         //cInfo.Name = c.Name;
                         cInfo.Id = c.ID;//entityId
@@ -168,6 +168,7 @@ namespace GameServer.Services
                 Name = request.Name,
                 Class = (int)request.Class,
                 TID = (int)request.Class,
+                Level = 1,
                 MapID = 1,
                 MapPosX = 5000,
                 MapPosY = 4000,
@@ -212,8 +213,8 @@ namespace GameServer.Services
             foreach (var c in sender.Session.User.Player.Characters)
             {
                 NCharacterInfo info = new NCharacterInfo();
-                info.Tid = c.ID;
-                info.Id = 0;//entityId
+                info.ConfigId = c.TID;
+                info.Id = c.ID;//entityId
                 info.Name = c.Name;
                 info.Type = CharacterType.Player;
                 info.Class = (CharacterClass)c.Class;
@@ -231,7 +232,7 @@ namespace GameServer.Services
             Log.InfoFormat("UserGameEnterRequest: characterID: {0} : {1} Map:{2}",dbchar.ID,dbchar.Name,dbchar.MapID);
             //CharacterManager角色管理器
             Character character = CharacterManager.Instance.AddCharacter(dbchar);
-
+            SessionManager.Instance.AddSession(character.Id, sender);
             //NetMessage message = new NetMessage();
             //message.Response = new NetMessageResponse();
             sender.Session.Response.gameEnter= new UserGameEnterResponse();
@@ -264,6 +265,7 @@ namespace GameServer.Services
 
             sender.SendResponse();
             sender.Session.Character = character;
+            sender.Session.PostResponser = character;//初始化后处理器
             MapManager.Instance[dbchar.MapID].CharacterEnter(sender, character);
 
         }
@@ -272,8 +274,9 @@ namespace GameServer.Services
         {
             Character character = sender.Session.Character;
             Log.InfoFormat("角色退出 :: UserGameLeaveRequest: characterID:{0} : {1} Map:{2}", character.Id, character.Info.Name, character.Info.mapId);
+            SessionManager.Instance.RemoveSession(character.Id);
 
-            CharacterLeave(character);
+            this.CharacterLeave(character);
             sender.Session.Character = null;
             //NetMessage message = new NetMessage();
             //message.Response = new NetMessageResponse();
@@ -288,6 +291,7 @@ namespace GameServer.Services
         {
             CharacterManager.Instance.RemoveCharacter(character.Id);
             MapManager.Instance[character.Info.mapId].CharacterLeave(character);
+            character.Clear();
         }
 
     }

@@ -1,6 +1,8 @@
-﻿using Common.Data;
+﻿using Common;
+using Common.Data;
 using GameServer.Core;
 using GameServer.Managers;
+using GameServer.Models;
 using Network;
 using SkillBridge.Message;
 using System;
@@ -25,6 +27,9 @@ namespace GameServer.Entities
         //{
         //    get { return this.Info.Id; }
         //}
+
+        public Team Team;
+        public int TeamUpdateTS;//时间戳
 
         public Character(CharacterType type,TCharacter cha):
             base(new Core.Vector3Int(cha.MapPosX, cha.MapPosY, cha.MapPosZ),new Core.Vector3Int(100,0,0))//初始化角色位置和面对的方向
@@ -60,6 +65,7 @@ namespace GameServer.Entities
 
             this.FriendManager = new FriendManager(this);
             this.FriendManager.GetFriendInfos(this.Info.Friends);
+            //Log.InfoFormat(this.FriendManager.)
 
         }
 
@@ -79,7 +85,27 @@ namespace GameServer.Entities
 
         public void PostProcess(NetMessageResponse message)
         {
-            this.FriendManager.PostProcess(message);
+            Log.InfoFormat("PostProcess > Character : characterID :{0}:{1}", this.Id, this.Info.Name);
+            this.FriendManager.PostProcess(message,this.FriendManager.get());
+
+            if(this.Team != null)
+            {
+                int i =this.Id;
+                Log.InfoFormat("PostProcess > Team: characterID : {0} : {1}   {2}<{3}", this.Id, this.Info.Name, TeamUpdateTS, this.Team.timestamp);
+                //Team t = TeamManager.Instance.GetTeamTimestamp(this);
+                //if (this.Team.timestamp < t.timestamp)
+                //{
+                //    this.Team = t;
+                //}
+
+                if (TeamUpdateTS < this.Team.timestamp)
+                {
+                    TeamUpdateTS = this.Team.timestamp;
+                    this.Team.PostProcess(message);
+                }
+                
+            }
+
             if (this.StatusManager.HasStatus)
             {
                 this.StatusManager.PostProcess(message);
@@ -91,7 +117,22 @@ namespace GameServer.Entities
         /// </summary>
         public void Clear()
         {
-            this.FriendManager.UpdateFriendInfo(this.Info, 0);
+            this.FriendManager.OfflineNotify();
+
+            TeamManager.Instance.LeaveTeamByCharacterInList(this);
         }
+
+
+        public NCharacterInfo GetBasicInfo()
+        {
+            return new NCharacterInfo()
+            {
+                Id = this.Id,
+                Name = this.Info.Name,
+                Class = this.Info.Class,
+                Level = this.Info.Level,
+            };
+        }
+
     }
 }

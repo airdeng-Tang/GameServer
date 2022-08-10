@@ -130,6 +130,8 @@ namespace GameServer.Services
                 var friend = SessionManager.Instance.GetSession(request.friendId);
                 if(friend != null)
                 {//在线
+                    var character1 = SessionManager.Instance.GetSession(character.Id);
+                    character1.Session.Character.FriendManager.RemoveFriendByFriendId(request.friendId);
                     friend.Session.Character.FriendManager.RemoveFriendByFriendId(character.Id);
                 }
                 else
@@ -150,9 +152,14 @@ namespace GameServer.Services
         void RemoveFriend(int charId,int friendId)
         {
             var removeItem = DBService.Instance.Entities.CharacterFriends.FirstOrDefault(v => v.CharacterID == charId && v.FriendID == friendId);
+            var removeItem2 = DBService.Instance.Entities.CharacterFriends.FirstOrDefault(v => v.CharacterID == friendId && v.FriendID == charId);
             if(removeItem != null)
             {
                 DBService.Instance.Entities.CharacterFriends.Remove(removeItem);
+            }
+            if(removeItem2 != null)
+            {
+                DBService.Instance.Entities.CharacterFriends.Remove(removeItem2);
             }
         }
     }

@@ -53,7 +53,7 @@ namespace Network
                 //{
                 //    this.Character.StatusManager.ApplyResponse(Response);
                 //}
-                if(PostResponser != null)
+                if (PostResponser != null)
                 {
                     this.PostResponser.PostProcess(Response);
                 }

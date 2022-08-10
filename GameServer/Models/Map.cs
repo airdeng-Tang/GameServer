@@ -127,7 +127,8 @@ namespace GameServer.Models
 
         void AddCharacterEnterMap(NetConnection<NetSession> conn, NCharacterInfo character)
         {
-            if(conn.Session.Response.mapCharacterEnter == null)
+            Log.InfoFormat("进入地图玩家id为 :: characterId:{0}", character.Id);
+            if (conn.Session.Response.mapCharacterEnter == null)
             {
                 conn.Session.Response.mapCharacterEnter = new MapCharacterEnterResponse();
                 conn.Session.Response.mapCharacterEnter.mapId=this.Define.ID;
@@ -138,6 +139,7 @@ namespace GameServer.Models
 
         void SendCharacterLeaveMap(NetConnection<NetSession> conn, Character character)
         {
+            Log.InfoFormat("SendCharacterLeaveMap To {0} : {1}  : Map : {2} Character : {3} : {4}",conn.Session.Character.Id,conn.Session.Character.Info.Name,this.Define.ID, character.Id, character.Info.Name);
             //NetMessage message = new NetMessage();
             //message.Response = new NetMessageResponse();
             

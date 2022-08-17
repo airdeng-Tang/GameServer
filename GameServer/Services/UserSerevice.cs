@@ -238,6 +238,11 @@ namespace GameServer.Services
             sender.Session.Response.gameEnter= new UserGameEnterResponse();
             sender.Session.Response.gameEnter.Result = Result.Success;
             sender.Session.Response.gameEnter.Errormsg = "None";
+
+
+            sender.Session.Character = character;
+            sender.Session.PostResponser = character;//初始化后处理器
+
             sender.Session.Response.gameEnter.Character = character.Info;
 
 
@@ -264,8 +269,6 @@ namespace GameServer.Services
 
 
             sender.SendResponse();
-            sender.Session.Character = character;
-            sender.Session.PostResponser = character;//初始化后处理器
             MapManager.Instance[dbchar.MapID].CharacterEnter(sender, character);
 
         }

@@ -15,6 +15,7 @@ namespace GameServer.Services
     class TeamService : Singleton<TeamService>
     {
 
+
         public TeamService()
         {
             MessageDistributer<NetConnection<NetSession>>.Instance.Subscribe<TeamInviteRequest>(this.OnTeamInviteRequest);

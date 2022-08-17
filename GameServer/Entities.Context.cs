@@ -46,6 +46,12 @@ public partial class ExtremeWorldEntities : DbContext
 
     public virtual DbSet<TCharacterFriend> CharacterFriends { get; set; }
 
+    public virtual DbSet<TGuild> TGuilds { get; set; }
+
+    public virtual DbSet<TGuildMember> TGuildMembers { get; set; }
+
+    public virtual DbSet<TGuildApply> TGuildApplies { get; set; }
+
 }
 
 }

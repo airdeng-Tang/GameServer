@@ -59,6 +59,8 @@ public partial class TCharacter
 
     public long Exp { get; set; }
 
+    public Nullable<int> GuildId { get; set; }
+
 
 
     public virtual TPlayer Player { get; set; }

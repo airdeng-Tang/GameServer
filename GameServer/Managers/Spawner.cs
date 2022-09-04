@@ -45,6 +45,7 @@ namespace GameServer.Managers
                     Log.ErrorFormat("SpawnRule[{0}]  SpawnPoint[{1}]  not existed", this.Define.ID, this.Define.SpawnPoint);
                 }
             }
+
         }
 
         public void Update()
@@ -75,7 +76,5 @@ namespace GameServer.Managers
             Log.InfoFormat("Map[{0}] Spawn[{1} : mon: {2} ,lv: {3}] At Point:{4}", this.Define.MapID, this.Define.ID, this.Define.SpawnMonID, this.Define.SpawnLevel,this.Define.SpawnPoint);
             this.Map.MonsterManager.Create(this.Define.SpawnMonID, this.Define.SpawnLevel, this.spawnPoint.Position, this.spawnPoint.Direction);
         }
-
-
     }
 }

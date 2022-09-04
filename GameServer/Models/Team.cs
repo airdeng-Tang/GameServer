@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Utils;
 using GameServer.Entities;
 using SkillBridge.Message;
 using System;
@@ -16,7 +17,7 @@ namespace GameServer.Models
 
         public List<Character> Members = new List<Character>();//成员列表
 
-        public int timestamp;//时间戳
+        public double timestamp;//时间戳
 
         public Team(Character leader)
         {
@@ -35,7 +36,7 @@ namespace GameServer.Models
             }
             this.Members.Add(member);
             //this.Members.Add(member);
-            timestamp = Time.timestamp;
+            timestamp = TimeUtil.timestamp;
             member.Team = this;
         }
 
@@ -56,7 +57,7 @@ namespace GameServer.Models
                 }
             }
             //member.Team = null;
-            timestamp = Time.timestamp;
+            timestamp = TimeUtil.timestamp;
         }
 
 

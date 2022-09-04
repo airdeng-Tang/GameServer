@@ -7,6 +7,7 @@ using SkillBridge.Message;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,13 +50,15 @@ namespace GameServer.Managers
             dbGuild.CreateTime = now;
             DBService.Instance.Entities.TGuilds.Add(dbGuild);
             DBService.Instance.Save();
+            Task.Delay(10).Wait();
 
             Guild guild = new Guild(dbGuild);
             guild.AddMember(leader.Id,leader.Name, leader.Data.Class,leader.Data.Level,SkillBridge.Message.GuildTitle.President);
             leader.Guild = guild;
             //TGuild tg = DBService.Instance.Entities.TGuilds.FirstOrDefault(x => x.Name == guild.Name);
-            leader.Data.GuildId = dbGuild.Id;
+            //leader.Data.GuildId = dbGuild.Id;
             DBService.Instance.Save();
+            Task.Delay(10).Wait();
             this.AddGuild(guild);
 
             return true;

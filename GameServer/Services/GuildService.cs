@@ -22,6 +22,8 @@ namespace GameServer.Services
             MessageDistributer<NetConnection<NetSession>>.Instance.Subscribe<GuildJoinResponse>(this.OnGuildJoinResponse);
          
             MessageDistributer<NetConnection<NetSession>>.Instance.Subscribe<GuildLeaveRequest>(this.OnGuildLeave);
+            MessageDistributer<NetConnection<NetSession>>.Instance.Subscribe<GuildAdminRequest>(this.OnGuildAdmin);
+            MessageDistributer<NetConnection<NetSession>>.Instance.Subscribe<GuildSetNoticeRequest>(this.OnGuildSetNotice);
 
         }
 
@@ -163,6 +165,54 @@ namespace GameServer.Services
             }
             sender.SendResponse();
 
+        }
+
+        private void OnGuildAdmin(NetConnection<NetSession> sender,GuildAdminRequest message)
+        {
+            Character character = sender.Session.Character;
+            Log.InfoFormat("OnGuildLeave: : character:{0}", character.Id);
+            sender.Session.Response.guildAdmin = new GuildAdminResponse();
+            if(character.Guild == null)
+            {
+                sender.Session.Response.guildAdmin.Result = Result.Failed;
+                sender.Session.Response.guildAdmin.Errormsg = "作弊者禁止访问";
+                sender.SendResponse();
+                return;
+            }
+
+            character.Guild.ExecuteAdmin(message.Command, message.Target, character.Id);
+
+            var target = SessionManager.Instance.GetSession(message.Target);
+            if(target != null)
+            {
+                target.Session.Response.guildAdmin = new GuildAdminResponse();
+                target.Session.Response.guildAdmin.Result = Result.Success;
+                target.Session.Response.guildAdmin.Command = message;
+                target.SendResponse();
+            }
+
+            sender.Session.Response.guildAdmin.Result = Result.Success;
+            sender.Session.Response.guildAdmin.Command = message;
+            sender.SendResponse();
+        }
+
+        private void OnGuildSetNotice(NetConnection<NetSession> sender,GuildSetNoticeRequest message)
+        {
+            Character character = sender.Session.Character;
+            Log.InfoFormat("OnGuildSetNotice: : character:{0}", character.Id);
+            if(character.Guild == null)
+            {
+                sender.Session.Response.guildSetNotice.Result = Result.Failed;
+                sender.Session.Response.guildSetNotice.Errormsg = "你没有公会";
+            }
+            else
+            {
+                character.Guild.SetNotice(message.newNotice);
+                sender.Session.Response.guildSetNotice = new GuildSetNoticeResponse();
+                sender.Session.Response.guildSetNotice.Result = Result.Success;
+                sender.Session.Response.guildSetNotice.Errormsg = null;
+            }
+            sender.SendResponse();
         }
     }
 }

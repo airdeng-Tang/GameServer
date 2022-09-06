@@ -34,6 +34,8 @@ namespace GameServer.Entities
         public Guild Guild;
         public double GuildUpdateTS;
 
+        public Chat Chat;
+
         public Character(CharacterType type,TCharacter cha):
             base(new Core.Vector3Int(cha.MapPosX, cha.MapPosY, cha.MapPosZ),new Core.Vector3Int(100,0,0))//初始化角色位置和面对的方向
         {
@@ -74,6 +76,8 @@ namespace GameServer.Entities
             {
                 this.Guild = GuildManager.Instance.GetGuild((int)this.Data.GuildId);
             }
+
+            this.Chat = new Chat(this);
 
         }
 
@@ -136,6 +140,8 @@ namespace GameServer.Entities
             {
                 this.StatusManager.PostProcess(message);
             }
+
+            this.Chat.PostProcess(message);
         }
 
         /// <summary>

@@ -56,7 +56,7 @@ namespace GameServer.Models
                     this.Leader = null;
                 }
             }
-            //member.Team = null;
+            member.Team = null;
             timestamp = TimeUtil.timestamp;
         }
 

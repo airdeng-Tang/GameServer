@@ -24,8 +24,9 @@ namespace GameServer.Services
         public void Init()
         {
             entities = new ExtremeWorldEntities();
-            //this.timestamp = TimeUtil.timestamp;
+            this.timestamp = (float)TimeUtil.timestamp;
         }
+
 
         public void Save()
         {

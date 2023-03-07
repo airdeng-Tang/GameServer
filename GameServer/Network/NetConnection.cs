@@ -124,8 +124,10 @@ namespace Network
                 State state = eventArgs.UserToken as State;
                 Socket socket = state.socket;
                 if (socket.Connected)
+                {
                     //socket.Send(data, offset, count, SocketFlags.None);
                     socket.BeginSend(data, 0, count, SocketFlags.None, new AsyncCallback(SendCallback), socket);
+                }
             }
         }
 

@@ -38,7 +38,6 @@ namespace GameServer.Managers
             {
                 this.Rules[i].Update();
             }
-            //throw new NotImplementedException();
         }
     }
 }

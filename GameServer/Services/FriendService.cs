@@ -88,9 +88,9 @@ namespace GameServer.Services
             Character character = sender.Session.Character;
             Log.InfoFormat("OnFriendAddResponse: : character: {0} Result:{1} FromId:{2} ToID:{3}", character.Id, response.Result, response.Request.FromId, response.Request.ToId);
             sender.Session.Response.friendAddRes = response;
+            var requester = SessionManager.Instance.GetSession(response.Request.FromId);
             if (response.Result == Result.Success)
             {
-                var requester = SessionManager.Instance.GetSession(response.Request.FromId);
                 if(requester == null)
                 {
                     sender.Session.Response.friendAddRes.Result = Result.Failed;
@@ -107,8 +107,14 @@ namespace GameServer.Services
                     requester.SendResponse();
                 }
             }
+            else
+            {
+                requester.Session.Response.friendAddRes = new FriendAddResponse();
+                requester.Session.Response.friendAddRes.Result = Result.Failed;
+                requester.Session.Response.friendAddRes.Errormsg = character.Name + "  拒绝加你为好友";
+            }
 
-            
+
             //sender.Session.Response.friendAddRes.Result = Result.Success;
             //sender.Session.Response.friendAddRes.Errormsg = response.Request.FromName + "成为您的好友";
             sender.SendResponse();

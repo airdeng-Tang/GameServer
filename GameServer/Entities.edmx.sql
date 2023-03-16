@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 02/16/2023 10:39:33
+-- Date Created: 03/15/2023 21:51:20
 -- Generated from EDMX file: E:\VipMmoRpg\mmorpg-25343cea276fd4e93f3a57f9ca1cf2291e688e4a\Src\Server\GameServer\GameServer\Entities.edmx
 -- --------------------------------------------------
 
@@ -112,6 +112,8 @@ CREATE TABLE [dbo].[Characters] (
     [Level] int  NOT NULL,
     [Exp] bigint  NOT NULL,
     [GuildId] int  NULL,
+    [HP] int  NOT NULL,
+    [MP] int  NOT NULL,
     [Player_ID] int  NOT NULL
 );
 GO

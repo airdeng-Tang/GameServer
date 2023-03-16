@@ -175,6 +175,8 @@ namespace GameServer.Services
                 MapPosZ = 820,
                 //Player = player
                 Gold = 100000,
+                HP = 1000,
+                MP = 1000,
                 Equips = new byte[28],
             };
             var bag = new TCharacterBag();

@@ -47,6 +47,7 @@ namespace GameServer.Entities
             this.Info.EntityId = this.entityId;
             this.Info.Name = cha.Name;
             this.Info.Level = 10;//cha.Level;
+            this.Info.Exp = cha.Exp;
             this.Info.ConfigId = cha.TID;
             this.Info.Class = (CharacterClass)cha.Class;
             this.Info.mapId = cha.MapID;
@@ -80,6 +81,33 @@ namespace GameServer.Entities
 
             this.Chat = new Chat(this);
 
+            this.Info.attrDynamic = new NAttributeDynamic();
+            this.Info.attrDynamic.Hp = cha.HP;
+            this.Info.attrDynamic.Mp = cha.MP;
+        }
+
+        internal void AddExp(int exp)
+        {
+            this.Exp += exp;
+            this.CheckLevelUp();
+        }
+
+        void CheckLevelUp()
+        {
+            //经验公式 : EXP = POWER(LV,3) * 10 + LV * 40 + 50
+            long needExp = (long)Math.Pow(this.Level, 3) * this.Level * 40 + 50;
+            if(this.Exp > needExp)
+            {
+                this.LevelUp();
+                this.Exp -= needExp;
+            }
+        }
+
+        void LevelUp()
+        {
+            this.Level += 1;
+            Log.InfoFormat("Chatacter[{0} : {1}] LevelUp : {2}", this.Id, this.Info.Name, this.Level);
+            CheckLevelUp();
         }
 
         public long Gold
@@ -96,6 +124,34 @@ namespace GameServer.Entities
             }
         }
 
+        public long Exp
+        {
+            get { return this.Data.Exp; }
+            private set
+            {
+                if(this.Data.Exp == value)
+                {
+                    return;
+                }
+                this.StatusManager.AddExpChange((int)(value - this.Data.Exp));
+                this.Data.Exp = value;
+            }
+        }
+
+        public int Level
+        {
+            get { return this.Data.Level; }
+            private set
+            {
+                if(this.Data.Level == value)
+                {
+                    return;
+                }
+                this.StatusManager.AddLevelUp((int)(value - this.Data.Level));
+                this.Data.Level = value;    
+            }
+        }
+
         public int Ride
         {
             get { return this.Info.Ride; }
@@ -109,6 +165,10 @@ namespace GameServer.Entities
             }
         }
 
+        /// <summary>
+        /// 后处理器
+        /// </summary>
+        /// <param name="message"></param>
         public void PostProcess(NetMessageResponse message)
         {
             Log.InfoFormat("PostProcess > Character : characterID :{0}:{1}", this.Id, this.Info.Name);

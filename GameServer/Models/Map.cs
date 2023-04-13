@@ -200,6 +200,18 @@ namespace GameServer.Models
                 this.AddCharacterEnterMap(kv.Value.connection, monster.Info);
             }
         }
-
+        
+        /// <summary>
+        /// 广播战斗
+        /// </summary>
+        /// <param name="response"></param>
+        public void BroadcastBattleResponse(NetMessageResponse response)
+        {
+            foreach(var kv in this.MapCharacters)
+            {
+                kv.Value.connection.Session.Response.skillCast = response.skillCast;
+                kv.Value.connection.SendResponse();
+            }
+        }
     }
 }

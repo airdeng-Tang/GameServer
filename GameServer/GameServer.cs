@@ -42,6 +42,7 @@ namespace GameServer
             TeamService.Instance.Init();
             GuildService.Instance.Init();
             ChatService.Instance.Init();
+            BattleService.Instance.Init();
 
             //user.Init();
             thread = new Thread(new ThreadStart(this.Update));

@@ -11,7 +11,10 @@ namespace GameServer.Managers
     class EntityManager : Singleton<EntityManager>
     {
         private int idx = 0;
-        public List<Entity> AllEntities = new List<Entity>();
+        //public List<Entity> AllEntities = new List<Entity>();
+
+        public Dictionary<int, Entity> AllEntities = new Dictionary<int, Entity>();
+
         /// <summary>
         /// 地图字典  int为地图编号
         /// </summary>
@@ -19,9 +22,10 @@ namespace GameServer.Managers
 
         public void AddEntity(int mapId , Entity entity)
         {
-            AllEntities.Add(entity);
+            //AllEntities.Add(entity);
             //加入管理器生成唯一Id  (其他类调用时的entityId)
             entity.EntityData.Id = ++this.idx;
+            AllEntities.Add(entity.EntityData.Id, entity);
 
             List<Entity> entities = null;
 
@@ -34,8 +38,20 @@ namespace GameServer.Managers
         }
         public void RemoveEntity(int mapId, Entity entity)
         {
-            this.AllEntities.Remove(entity);
+            this.AllEntities.Remove(entity.entityId);
             this.MapEntities[mapId].Remove(entity);
+        }
+
+        public Entity GetEntity(int entityId)
+        {
+            Entity result = null;
+            this.AllEntities.TryGetValue(entityId, out result);
+            return result;
+        }
+
+        public Creature GetCreature(int entityId)
+        {
+            return GetEntity(entityId) as Creature; 
         }
     }
 }

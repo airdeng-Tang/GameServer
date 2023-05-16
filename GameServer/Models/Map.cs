@@ -181,7 +181,7 @@ namespace GameServer.Models
                 if(kv.Value.character.entityId == entity.Id)
                 {
                     kv.Value.character.Position = entity.Entity.Position;
-                    kv.Value.character.Direction = entity.Entity.Direction;
+                    kv.Value.character.DirectionEntity = entity.Entity.Direction;
                     kv.Value.character.Speed = entity.Entity.Speed;
                     if(entity.Event == EntityEvent.Ride)
                     {

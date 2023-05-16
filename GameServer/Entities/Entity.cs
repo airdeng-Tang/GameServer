@@ -28,7 +28,7 @@ namespace GameServer.Entities
         }
 
         private Vector3Int direction;
-        public Vector3Int Direction
+        public Vector3Int DirectionEntity
         {
             get { return direction; }
             set
@@ -79,7 +79,7 @@ namespace GameServer.Entities
         public void SetEntityData(NEntity entity)
         {
             this.Position = entity.Position;
-            this.Direction = entity.Direction;
+            this.DirectionEntity = entity.Direction;
             this.speed = entity.Speed;
         }
 

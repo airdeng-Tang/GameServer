@@ -101,5 +101,27 @@ namespace GameServer.Entities
         {
             this.SkillMgr.Update();
         }
+
+        /// <summary>
+        /// 计算此对象与目标对象的距离
+        /// </summary>
+        /// <param name="target"> 目标对象 </param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        internal int Direction(Creature target)
+        {
+            return (int)Vector3Int.Distance(this.Position, target.Position);
+        }
+
+        /// <summary>
+        /// 计算此对象与目标坐标的距离
+        /// </summary>
+        /// <param name="position"> 目标坐标 </param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        internal int Direction(Vector3Int position)
+        {
+            return (int)Vector3Int.Distance(this.Position, position);
+        }
     }
 }

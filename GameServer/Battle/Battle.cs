@@ -1,4 +1,5 @@
-﻿using GameServer.Entities;
+﻿using GameServer.Core;
+using GameServer.Entities;
 using GameServer.Managers;
 using GameServer.Models;
 using Network;
@@ -120,5 +121,23 @@ namespace GameServer.Battle
                 this.LeaveBattle(unit);
             }
         }
+
+        internal List<Creature> FindUnitsInRange(Vector3Int pos, int range)
+        {
+            List<Creature> result = new List<Creature>();
+            foreach(var unit in this.AllUnits)
+            {
+                if(unit.Value.Direction(pos) < range)
+                {
+                    result.Add(unit.Value);
+                }
+            }
+            return result;
+        }
+
+        //public void AddHitInfo(NSkillHitInfo hit)
+        //{
+        //    this.Hits.Add(hit); 
+        //}
     }
 }

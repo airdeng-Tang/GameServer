@@ -1,5 +1,7 @@
 ﻿using Common;
 using Common.Data;
+using Common.Utils;
+using GameServer.Core;
 using GameServer.Entities;
 using GameServer.Managers;
 using SkillBridge.Message;
@@ -165,12 +167,144 @@ namespace GameServer.Battle
             return result;
         }
 
-        private void DoHit()
+        /// <summary>
+        /// 开始命中处理
+        /// </summary>
+        void InitHitInfo()
         {
-            this.Hit++;
-            Log.InfoFormat("Skill[{0}].DoHit[{1}] :: 技能名 & 造成伤害次数", this.Define.Name, this.Hit);
+
         }
 
+        private void DoHit()
+        {
+            this.InitHitInfo();
+            Log.InfoFormat("Skill[{0}].DoHit[{1}] :: 技能名 & 造成伤害次数", this.Define.Name, this.Hit);
+
+            this.Hit++;
+
+            if (this.Define.Bullet)
+            {
+                CastBullet();
+                return;
+            }
+
+            if(this.Define.AOERange > 0)
+            {
+                this.HitRange();
+                return;
+            }
+
+            if(this.Define.CastTarget == Common.Battle.TargetType.Target)
+            {
+                this.HitTarget(Context.Target);
+            }
+        }
+
+
+
+        /// <summary>
+        /// 生成子弹
+        /// </summary>
+        void CastBullet()
+        {
+            
+        }
+
+        /// <summary>
+        /// 范围伤害 AOE
+        /// </summary>
+        void HitRange()
+        {
+            Vector3Int pos;
+            if(this.Define.CastTarget == Common.Battle.TargetType.Target)
+            {
+                pos = Context.Target.Position;  //以目标对象为中心的aoe  (冰拳特效)
+            }
+            else if(this.Define.CastTarget == Common.Battle.TargetType.Position)
+            {
+                pos = Context.Position;  //以坐标作为技能中心  (常规aoe 暴风雪 烈焰风暴等)
+            }
+            else
+            {
+                pos = this.Owner.Position; //以自身为中心的aoe (大风车等)
+            }
+
+            List<Creature> units = this.Context.Battle.FindUnitsInRange(pos, this.Define.AOERange);
+            foreach(var target in units)
+            {
+                this.HitTarget(target);
+            }
+        }
+
+        /// <summary>
+        /// 选中目标释放技能
+        /// </summary>
+        /// <param name="target"></param>
+        void HitTarget(Creature target)
+        {
+            if(this.Define.CastTarget == Common.Battle.TargetType.Self && (target != Context.Caster))
+            {
+                return;
+            }
+            else if(target == Context.Caster)
+            {
+                return;
+            }
+
+            NDamageInfo damage = this.CalcSkillDamage(Context.Caster, target);
+            Log.InfoFormat("Skill[{0}].HitTarget[{1}] Damage:{2} Crit: {3}",
+                this.Define.Name, target.Name, damage.Damage, damage.Crit);
+            target.DoDamage(damage);
+            //this.HitInfo.Damages.Add(damage);
+        }
+
+        /// <summary>
+        /// 伤害计算
+        /// 战斗计算公式: 
+        /// 物理伤害 = 物理攻击或技能基础伤害 * (1-物理防御 / 物理防御 +100))
+        /// 魔法伤害 = 魔法攻击或技能基础伤害 * (1-魔法防御 / 魔法防御 +100))
+        /// 暴击伤害 = 固定伤害 * 2
+        /// 注 : 伤害值最小值为1 当伤害值小于1时取值1
+        /// 注 : 最终伤害值在最终取舍时随机上下浮动 5%. 即: 伤害值 * 95% <= 最终伤害值 <= 伤害值 * 105%
+        /// </summary>
+        /// <param name="caster">施法者</param>
+        /// <param name="target">施法目标</param>
+        /// <returns></returns>
+        NDamageInfo CalcSkillDamage(Creature caster, Creature target)
+        {
+            float ad = this.Define.AD + caster.Attributes.AD * this.Define.ADFactor;
+            float ap = this.Define.AP + caster.Attributes.AP * this.Define.APFactor;
+
+            float addmg = ad * (1 - target.Attributes.DEF / (target.Attributes.DEF + 100));
+            float apdmg = ap * (1 - target.Attributes.MDEF / (target.Attributes.MDEF + 100));
+
+            float final = addmg + apdmg;
+            bool isCrit = IsCrit(caster.Attributes.CRI);
+            if (isCrit)
+            {
+                final = final * 2f;//暴击伤害 * 2
+            }
+
+            //随即浮动
+            final = final + final * ((float)MathUtil.Random.NextDouble() * 0.1f - 0.05f);
+
+            NDamageInfo damage = new NDamageInfo();
+            damage.entityId = target.entityId;
+            damage.Damage = Math.Max(1, (int)final);
+            damage.Crit = isCrit;
+            return damage;
+        }
+
+        /// <summary>
+        /// 是否暴击
+        /// </summary>
+        /// <param name="cRI">暴击概率</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private bool IsCrit(float crit)
+        {
+            return MathUtil.Random.NextDouble() < crit;
+        }
 
         /// <summary>
         /// 执行技能逻辑, 实现技能效果

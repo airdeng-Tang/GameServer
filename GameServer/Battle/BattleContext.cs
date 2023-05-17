@@ -14,9 +14,21 @@ namespace GameServer.Battle
     /// </summary>
     class BattleContext
     {
+        /// <summary>
+        /// 技能
+        /// </summary>
         public Battle Battle;
+        /// <summary>
+        /// 施法者
+        /// </summary>
         public Creature Caster;
+        /// <summary>
+        /// 施法目标
+        /// </summary>
         public Creature Target;
+        /// <summary>
+        /// 施法坐标
+        /// </summary>
         public Vector3Int Position;
 
         public NSkillCastInfo CastSkill;

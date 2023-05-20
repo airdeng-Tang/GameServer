@@ -22,7 +22,7 @@ namespace GameServer.Managers
         internal void ProcessBattleMessage(NetConnection<NetSession> sender, SkillCastRequest request)
         {
             Log.InfoFormat("BattleManager.ProcessBattleMessage: skill:{0} caster:{1} target:{2} pos:{3}",
-                request.castInfo.skillId, request.castInfo.casterId, request.castInfo.targetId, request.castInfo.Position);
+                request.castInfo.skillId, request.castInfo.casterId, request.castInfo.targetId, request.castInfo.Position.String());
             Character character = sender.Session.Character;
             var battle = MapManager.Instance[character.Info.mapId].Battle;
 

@@ -210,14 +210,21 @@ namespace GameServer.Models
         }
         
         /// <summary>
-        /// 广播战斗
+        /// 战斗信息广播
         /// </summary>
         /// <param name="response"></param>
         public void BroadcastBattleResponse(NetMessageResponse response)
         {
             foreach(var kv in this.MapCharacters)
             {
-                kv.Value.connection.Session.Response.skillCast = response.skillCast;
+                if(response.skillCast != null)
+                {
+                    kv.Value.connection.Session.Response.skillCast = response.skillCast;
+                }
+                if (response.skillHits != null)
+                {
+                    kv.Value.connection.Session.Response.skillHits = response.skillHits;
+                }
                 kv.Value.connection.SendResponse();
             }
         }

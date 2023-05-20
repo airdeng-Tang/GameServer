@@ -7,6 +7,7 @@ using SkillBridge.Message;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +23,8 @@ namespace GameServer.Battle
         Dictionary<int, Creature> AllUnits = new Dictionary<int, Creature>();
 
         Queue<NSkillCastInfo> Actions = new Queue<NSkillCastInfo>();
+
+        List<NSkillHitInfo> Hits = new List<NSkillHitInfo>();   
 
         /// <summary>
         /// 已死亡的单位
@@ -55,13 +58,16 @@ namespace GameServer.Battle
 
         internal void Update()
         {
+            this.Hits.Clear();
             if(this.Actions.Count > 0)
             {
                 NSkillCastInfo skillCast = this.Actions.Dequeue();
                 this.ExecuteAction(skillCast);
             }
-
+             
             this.UpdateUnits();
+
+            this.BroadcastHitsMessage();
         }
 
         /// <summary>
@@ -78,6 +84,10 @@ namespace GameServer.Battle
             this.AllUnits.Remove(unit.entityId);
         }
 
+        /// <summary>
+        /// 广播受击消息
+        /// </summary>
+        /// <param name="cast"></param>
         void ExecuteAction(NSkillCastInfo cast)
         {
             BattleContext context = new BattleContext(this);
@@ -103,6 +113,22 @@ namespace GameServer.Battle
             message.skillCast.Errormsg = context.Result.ToString();
             this.Map.BroadcastBattleResponse(message);
         }
+
+
+        private void BroadcastHitsMessage()
+        {
+            if(this.Hits.Count == 0)
+            {
+                return;
+            }
+            NetMessageResponse message = new NetMessageResponse();
+            message.skillHits = new SkillHitResponse();
+            message.skillHits.Hits.AddRange(this.Hits);
+            message.skillHits.Result = Result.Success;
+            message.skillHits.Errormsg = "";
+            this.Map.BroadcastBattleResponse(message);
+        }
+
 
         void UpdateUnits()
         {
@@ -135,9 +161,14 @@ namespace GameServer.Battle
             return result;
         }
 
-        //public void AddHitInfo(NSkillHitInfo hit)
+        //internal void AddHitInfo(NSkillHitInfo hitInfo)
         //{
-        //    this.Hits.Add(hit); 
+        //    throw new NotImplementedException();
         //}
+
+        public void AddHitInfo(NSkillHitInfo hit)
+        {
+            this.Hits.Add(hit);
+        }
     }
 }

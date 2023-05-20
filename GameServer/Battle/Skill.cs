@@ -39,6 +39,7 @@ namespace GameServer.Battle
         private float skillTime = 0;
         private int Hit = 0;
         BattleContext Context;
+        NSkillHitInfo HitInfo;
 
         /// <summary>
         /// 是否为瞬发技能
@@ -172,7 +173,11 @@ namespace GameServer.Battle
         /// </summary>
         void InitHitInfo()
         {
-
+            this.HitInfo = new NSkillHitInfo();
+            this.HitInfo.casterId = this.Context.Caster.entityId;
+            this.HitInfo.skillId = this.Info.Id;
+            this.HitInfo.hitId = this.Hit;
+            Context.Battle.AddHitInfo(this.HitInfo);
         }
 
         private void DoHit()
@@ -250,12 +255,12 @@ namespace GameServer.Battle
             {
                 return;
             }
-
+            
             NDamageInfo damage = this.CalcSkillDamage(Context.Caster, target);
             Log.InfoFormat("Skill[{0}].HitTarget[{1}] Damage:{2} Crit: {3}",
                 this.Define.Name, target.Name, damage.Damage, damage.Crit);
             target.DoDamage(damage);
-            //this.HitInfo.Damages.Add(damage);
+            this.HitInfo.Damages.Add(damage);
         }
 
         /// <summary>

@@ -39,7 +39,9 @@ namespace GameServer.Battle
         private float skillTime = 0;
         private int Hit = 0;
         BattleContext Context;
-        NSkillHitInfo HitInfo;
+        //NSkillHitInfo HitInfo;
+
+        List<Bullet> Bullets = new List<Bullet>();
 
         /// <summary>
         /// 是否为瞬发技能
@@ -140,6 +142,7 @@ namespace GameServer.Battle
                 this.cd = this.Define.CD;
                 this.Hit = 0;
                 this.Context = context;
+                this.Bullets.Clear();
 
 
                 if (this.Instant)
@@ -171,37 +174,48 @@ namespace GameServer.Battle
         /// <summary>
         /// 开始命中处理
         /// </summary>
-        void InitHitInfo()
+        NSkillHitInfo InitHitInfo(bool isBullet)
         {
-            this.HitInfo = new NSkillHitInfo();
-            this.HitInfo.casterId = this.Context.Caster.entityId;
-            this.HitInfo.skillId = this.Info.Id;
-            this.HitInfo.hitId = this.Hit;
-            Context.Battle.AddHitInfo(this.HitInfo);
+            NSkillHitInfo HitInfo = new NSkillHitInfo();
+            HitInfo.casterId = this.Context.Caster.entityId;
+            HitInfo.skillId = this.Info.Id;
+            HitInfo.hitId = this.Hit;
+            HitInfo.isBullet = isBullet;
+            //Context.Battle.AddHitInfo(HitInfo);
+            return HitInfo;
         }
 
         private void DoHit()
         {
-            this.InitHitInfo();
+            NSkillHitInfo HitInfo = InitHitInfo(false);
             Log.InfoFormat("Skill[{0}].DoHit[{1}] :: 技能名 & 造成伤害次数", this.Define.Name, this.Hit);
 
             this.Hit++;
 
             if (this.Define.Bullet)
             {
-                CastBullet();
+                CastBullet(HitInfo);
                 return;
             }
 
+            DoHit(HitInfo);
+        }
+
+        public void DoHit(NSkillHitInfo HitInfo) 
+        {
+            Context.Battle.AddHitInfo(HitInfo);
+            Log.InfoFormat($"Skill[{this.Define.Name}].DoHit[{HitInfo.hitId}]  IsBullet:{HitInfo.isBullet}");
+
+
             if(this.Define.AOERange > 0)
             {
-                this.HitRange();
+                this.HitRange(HitInfo);
                 return;
             }
 
             if(this.Define.CastTarget == Common.Battle.TargetType.Target)
             {
-                this.HitTarget(Context.Target);
+                this.HitTarget(Context.Target,HitInfo);
             }
         }
 
@@ -210,15 +224,21 @@ namespace GameServer.Battle
         /// <summary>
         /// 生成子弹
         /// </summary>
-        void CastBullet()
+        void CastBullet(NSkillHitInfo HitInfo)
         {
-            
+            Context.Battle.AddHitInfo(HitInfo);
+            //Log.InfoFormat($"Skill[{this.Define.Name}].DoHit[{HitInfo.hitId}]  IsBullet:{HitInfo.isBullet}");
+            Log.InfoFormat("Skill[{0}].CastBullet[{1}]  Target : {2}",
+                this.Define.Name, this.Define.BulletResource,this.Context.Target.Name);
+
+            Bullet bullet = new Bullet(this, this.Context.Target, HitInfo);
+            this.Bullets.Add(bullet);
         }
 
         /// <summary>
         /// 范围伤害 AOE
         /// </summary>
-        void HitRange()
+        void HitRange(NSkillHitInfo HitInfo)
         {
             Vector3Int pos;
             if(this.Define.CastTarget == Common.Battle.TargetType.Target)
@@ -237,7 +257,7 @@ namespace GameServer.Battle
             List<Creature> units = this.Context.Battle.FindUnitsInRange(pos, this.Define.AOERange);
             foreach(var target in units)
             {
-                this.HitTarget(target);
+                this.HitTarget(target, HitInfo);
             }
         }
 
@@ -245,7 +265,7 @@ namespace GameServer.Battle
         /// 选中目标释放技能
         /// </summary>
         /// <param name="target"></param>
-        void HitTarget(Creature target)
+        void HitTarget(Creature target, NSkillHitInfo HitInfo)
         {
             if(this.Define.CastTarget == Common.Battle.TargetType.Self && (target != Context.Caster))
             {
@@ -260,7 +280,7 @@ namespace GameServer.Battle
             Log.InfoFormat("Skill[{0}].HitTarget[{1}] Damage:{2} Crit: {3}",
                 this.Define.Name, target.Name, damage.Damage, damage.Crit);
             target.DoDamage(damage);
-            this.HitInfo.Damages.Add(damage);
+            HitInfo.Damages.Add(damage);
         }
 
         /// <summary>
@@ -355,11 +375,11 @@ namespace GameServer.Battle
         }
 
         /// <summary>
-        /// 释放中
+        /// 释放技能中
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
         private void UpdateSkill()
-        {
+        { 
             this.skillTime += Time.deltaTime;
             if(this.Define.Duration > 0)
             {//持续技能 (间隔时间计算次数)
@@ -385,10 +405,34 @@ namespace GameServer.Battle
                 }
                 else
                 {
-                    this.Status = SkillStatus.None;
-                    Log.InfoFormat("Skill[{0}].UpdateSkill Finish :: 技能释放完毕", this.Define.Name);
+                    if (!this.Define.Bullet)
+                    {
+                        this.Status = SkillStatus.None;
+                        Log.InfoFormat("Skill[{0}].UpdateSkill Finish :: 技能释放完毕", this.Define.Name);
+                    }
+
                 }
             }
+
+            if (this.Define.Bullet)
+            {
+                bool finish = true;
+                foreach(Bullet bullet in this.Bullets)
+                {
+                    bullet.Update();
+                    if(!bullet.Stoped)
+                    {
+                        finish = false;
+                    }
+                }
+
+                if(finish && this.Hit >= this.Define.HitTimes.Count)
+                {
+                    this.Status = SkillStatus.None;
+                    Log.InfoFormat($"Skill[{this.Define.Name}].UpdateSkill Finish");
+                }
+            }
+
         }
 
         private void UpdateCD()

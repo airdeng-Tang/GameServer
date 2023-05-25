@@ -8,6 +8,9 @@ using Common;
 using Common.Data;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using GameServer.Models;
+
 namespace GameServer.Managers
 {
     public class DataManager : Singleton<DataManager>
@@ -72,6 +75,15 @@ namespace GameServer.Managers
 
             json = File.ReadAllText(this.DataPath + "SkillDefine.txt");
             this.Skills = JsonConvert.DeserializeObject<Dictionary<int, Dictionary<int, SkillDefine>>>(json);
+            
+            Console.WriteLine("Console.WriteLine :: 技能名: {0} 间隔时间: {1} 持续时间: {2} MP消耗 : {3}",
+                Skills[1][103].Name, Skills[1][103].Interval, Skills[1][103].Duration, Skills[1][103].MPCost);
+            Console.WriteLine("Console.WriteLine :: 技能名: {0} 间隔时间: {1} 持续时间: {2} MP消耗 : {3}",
+                Skills[2][203].Name, Skills[2][203].Interval, Skills[2][203].Duration, Skills[2][203].MPCost);
+            //Console.WriteLine("Console.WriteLine :: 技能名: {0} 间隔时间: {1} 持续时间: {2} MP消耗 : {3} Fuck : {4}",
+            //    Skills[1][103].Name, Skills[1][103].Interval, Skills[1][103].Duration, Skills[1][103].MPCost , Skills[1][103].fuck);
+            //Console.WriteLine("Console.WriteLine :: 技能名: {0} 间隔时间: {1} 持续时间: {2} MP消耗 : {3} Fuck : {4}",
+            //    Skills[2][203].Name, Skills[2][203].Interval, Skills[2][203].Duration, Skills[2][203].MPCost , Skills[2][203].fuck);
         }
     }
 }

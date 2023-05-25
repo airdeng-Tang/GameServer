@@ -114,7 +114,9 @@ namespace GameServer.Battle
             this.Map.BroadcastBattleResponse(message);
         }
 
-
+        /// <summary>
+        /// 创建伤害信息网络响应并用地图类广播
+        /// </summary>
         private void BroadcastHitsMessage()
         {
             if(this.Hits.Count == 0)

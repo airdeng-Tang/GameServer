@@ -254,6 +254,15 @@ namespace GameServer.Battle
                 pos = this.Owner.Position; //以自身为中心的aoe (大风车等)
             }
 
+            //预先将施法范围中的对象加入战斗对象中(试用)
+            foreach (var monster in this.Context.Battle.Map.MonsterManager.Monsters)
+            {
+                if (monster.Value.Direction(pos) < this.Define.AOERange)
+                {
+                    this.Context.Battle.JoinBattle(monster.Value);
+                }
+            }
+
             List<Creature> units = this.Context.Battle.FindUnitsInRange(pos, this.Define.AOERange);
             foreach(var target in units)
             {

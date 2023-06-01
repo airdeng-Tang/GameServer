@@ -24,7 +24,9 @@ namespace GameServer.Battle
 
         Queue<NSkillCastInfo> Actions = new Queue<NSkillCastInfo>();
 
-        List<NSkillHitInfo> Hits = new List<NSkillHitInfo>();   
+        List<NSkillHitInfo> Hits = new List<NSkillHitInfo>(); 
+        
+        List<NBuffInfo> BuffActions = new List<NBuffInfo>();
 
         /// <summary>
         /// 已死亡的单位
@@ -59,6 +61,7 @@ namespace GameServer.Battle
         internal void Update()
         {
             this.Hits.Clear();
+            this.BuffActions.Clear();
             if(this.Actions.Count > 0)
             {
                 NSkillCastInfo skillCast = this.Actions.Dequeue();
@@ -94,7 +97,6 @@ namespace GameServer.Battle
             context.Caster = EntityManager.Instance.GetCreature(cast.casterId);
             context.Target = EntityManager.Instance.GetCreature(cast.targetId);
             context.CastSkill = cast;
-            context.Position = cast.Position;
             if(context.Caster != null)
             {
                 this.JoinBattle(context.Caster);
@@ -109,30 +111,41 @@ namespace GameServer.Battle
             NetMessageResponse message = new NetMessageResponse();
             message.skillCast = new SkillCastResponse();
             message.skillCast.castInfo = context.CastSkill;
-            message.skillCast.Damage = context.Damage;
             message.skillCast.Result = context.Result == SkillResult.Ok ? Result.Success : Result.Failed;
             message.skillCast.Errormsg = context.Result.ToString();
             this.Map.BroadcastBattleResponse(message);
         }
 
         /// <summary>
-        /// 创建伤害信息网络响应并用地图类广播
+        /// 创建伤害信息和buff信息的网络响应并用地图类广播
         /// </summary>
         private void BroadcastHitsMessage()
         {
-            if(this.Hits.Count == 0)
+            if(this.Hits.Count == 0 && this.BuffActions.Count == 0)
             {
                 return;
             }
             NetMessageResponse message = new NetMessageResponse();
-            message.skillHits = new SkillHitResponse();
-            message.skillHits.Hits.AddRange(this.Hits);
-            message.skillHits.Result = Result.Success;
-            message.skillHits.Errormsg = "";
+            if(this.Hits.Count > 0)
+            {
+                message.skillHits = new SkillHitResponse();
+                message.skillHits.Hits.AddRange(this.Hits);
+                message.skillHits.Result = Result.Success;
+                message.skillHits.Errormsg = "";
+            }
+            if(this.BuffActions.Count > 0)
+            {
+                message.Buffres = new BuffResponse();
+                message.Buffres.Buffs.AddRange(this.BuffActions);
+                message.Buffres.Errormsg = "";
+                message.Buffres.Result = Result.Success;
+            }
             this.Map.BroadcastBattleResponse(message);
         }
 
-
+        /// <summary>
+        /// 更新管理战斗中死亡单位
+        /// </summary>
         void UpdateUnits()
         {
             this.DeahPool.Clear();
@@ -163,6 +176,17 @@ namespace GameServer.Battle
             }
             return result;
         }
+        
+        /// <summary>
+        /// 查找地图中在aoe技能范围内的对象
+        /// </summary>
+        /// <param name="pos"> aoe技能释放中心 </param>
+        /// <param name="range"> aoe技能范围半径 </param>
+        /// <returns></returns>
+        internal List<Creature> FindUnitsInMapRange(Vector3Int pos, int range)
+        {
+            return EntityManager.Instance.GetMapEntitiesInRange<Creature>(this.Map.ID, pos, range);
+        }
 
         //internal void AddHitInfo(NSkillHitInfo hitInfo)
         //{
@@ -172,6 +196,11 @@ namespace GameServer.Battle
         public void AddHitInfo(NSkillHitInfo hit)
         {
             this.Hits.Add(hit);
+        }
+
+        internal void AddBuffAction(NBuffInfo buff)
+        {
+            this.BuffActions.Add(buff);
         }
     }
 }

@@ -29,14 +29,12 @@ namespace GameServer.Battle
         /// <summary>
         /// 施法坐标
         /// </summary>
-        public Vector3Int Position;
+        public Vector3Int Position
+        {
+            get { return this.CastSkill.Position; }
+        }
 
         public NSkillCastInfo CastSkill;
-
-        /// <summary>
-        /// 技能造成的伤害 (或生命值恢复)
-        /// </summary>
-        public NDamageInfo Damage;
 
         public SkillResult Result;
 

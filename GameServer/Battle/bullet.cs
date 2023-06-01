@@ -25,6 +25,9 @@ namespace GameServer.Battle
         /// </summary>
         float duration = 0;
 
+        /// <summary>
+        /// 子弹飞行时间
+        /// </summary>
         float flyTime = 0;
 
         public bool Stoped = false;

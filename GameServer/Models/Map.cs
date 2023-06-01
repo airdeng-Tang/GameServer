@@ -225,6 +225,10 @@ namespace GameServer.Models
                 {
                     kv.Value.connection.Session.Response.skillHits = response.skillHits;
                 }
+                if (response.Buffres != null)
+                {
+                    kv.Value.connection.Session.Response.Buffres = response.Buffres;
+                }
                 kv.Value.connection.SendResponse();
             }
         }

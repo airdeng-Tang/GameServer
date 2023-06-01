@@ -29,12 +29,18 @@ namespace GameServer.Entities
             get { return this.Info.Name; }
         }
 
-
         public NCharacterInfo Info;
         public CharacterDefine Define;
 
         public Attributes Attributes;
         public SkillManager SkillMgr;
+
+        public BuffManager BuffMgr;
+
+        /// <summary>
+        /// buff效果管理器
+        /// </summary>
+        public EffectManager EffectMgr;
 
         public bool IsDeath = false;
 
@@ -58,6 +64,7 @@ namespace GameServer.Entities
             this.Info.Name = this.Define.Name;
 
             this.InitSkills();
+            this.InitBuffs();
 
             this.Attributes = new Attributes();
             this.Attributes.Init(this.Define, this.Info.Level, this.GetEquips(), this.Info.attrDynamic);
@@ -68,6 +75,12 @@ namespace GameServer.Entities
         {
             SkillMgr = new SkillManager(this);
             this.Info.Skills.AddRange(this.SkillMgr.Infos);
+        }
+
+        void InitBuffs()
+        {
+            BuffMgr = new BuffManager(this);
+            EffectMgr = new EffectManager(this);
         }
 
         public virtual List<EquipDefine> GetEquips()
@@ -100,6 +113,7 @@ namespace GameServer.Entities
         public override void Update()
         {
             this.SkillMgr.Update();
+            this.BuffMgr.Update();
         }
 
         /// <summary>
@@ -122,6 +136,11 @@ namespace GameServer.Entities
         internal int Direction(Vector3Int position)
         {
             return (int)Vector3Int.Distance(this.Position, position);
+        }
+
+        internal void AddBuff(BattleContext context, BuffDefine buffDefine)
+        {
+            this.BuffMgr.AddBuff(context, buffDefine);
         }
     }
 }

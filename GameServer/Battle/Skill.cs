@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Battle;
 using Common.Data;
 using Common.Utils;
 using GameServer.Core;
@@ -144,6 +145,7 @@ namespace GameServer.Battle
                 this.Context = context;
                 this.Bullets.Clear();
 
+                this.AddBuff(TriggerType.SkillCast);
 
                 if (this.Instant)
                 {
@@ -224,6 +226,7 @@ namespace GameServer.Battle
         /// <summary>
         /// 生成子弹
         /// </summary>
+        /// <param name="HitInfo"> 技能信息 </param>
         void CastBullet(NSkillHitInfo HitInfo)
         {
             Context.Battle.AddHitInfo(HitInfo);
@@ -254,18 +257,10 @@ namespace GameServer.Battle
                 pos = this.Owner.Position; //以自身为中心的aoe (大风车等)
             }
 
-            //预先将施法范围中的对象加入战斗对象中(试用)
-            foreach (var monster in this.Context.Battle.Map.MonsterManager.Monsters)
-            {
-                if (monster.Value.Direction(pos) < this.Define.AOERange)
-                {
-                    this.Context.Battle.JoinBattle(monster.Value);
-                }
-            }
-
-            List<Creature> units = this.Context.Battle.FindUnitsInRange(pos, this.Define.AOERange);
+            List<Creature> units = this.Context.Battle.FindUnitsInMapRange(pos, this.Define.AOERange);
             foreach(var target in units)
             {
+                MapManager.Instance[this.Owner.Info.mapId].Battle.JoinBattle(target);
                 this.HitTarget(target, HitInfo);
             }
         }
@@ -286,11 +281,42 @@ namespace GameServer.Battle
             }
             
             NDamageInfo damage = this.CalcSkillDamage(Context.Caster, target);
-            Log.InfoFormat("Skill[{0}].HitTarget[{1}] Damage:{2} Crit: {3}",
+            Log.InfoFormat("Skill[{0}].HitTarget[{1}] 伤害Damage:{2} 暴击Crit: {3}",
                 this.Define.Name, target.Name, damage.Damage, damage.Crit);
             target.DoDamage(damage);
             HitInfo.Damages.Add(damage);
+
+            this.AddBuff(TriggerType.SkillHit);
         }
+
+
+        private void AddBuff(TriggerType trigger)
+        {
+            if (this.Define.Buff == null || this.Define.Buff.Count == 0)
+            {
+                return;
+            }
+
+            foreach(var buffId in this.Define.Buff)
+            {
+                var buffDefine = DataManager.Instance.Buffs[buffId];
+
+                if(buffDefine.Trigger != trigger) //触发时机不一致
+                {
+                    continue;
+                }
+
+                if(buffDefine.Target == TargetType.Self)
+                {
+                    this.Owner.AddBuff(this.Context, buffDefine);
+                }
+                else if(buffDefine.Target == TargetType.Target)
+                {
+                    this.Context.Target.AddBuff(this.Context, buffDefine);
+                }
+            }
+        }
+
 
         /// <summary>
         /// 伤害计算
@@ -338,18 +364,6 @@ namespace GameServer.Battle
         private bool IsCrit(float crit)
         {
             return MathUtil.Random.NextDouble() < crit;
-        }
-
-        /// <summary>
-        /// 执行技能逻辑, 实现技能效果
-        /// </summary>
-        /// <param name="context"></param>
-        private void DoSkillDamage(BattleContext context)
-        {
-            context.Damage = new NDamageInfo();
-            context.Damage.entityId = context.Target.entityId;
-            context.Damage.Damage = 100;
-            context.Target.DoDamage(context.Damage);
         }
 
         public void Update()
@@ -419,7 +433,6 @@ namespace GameServer.Battle
                         this.Status = SkillStatus.None;
                         Log.InfoFormat("Skill[{0}].UpdateSkill Finish :: 技能释放完毕", this.Define.Name);
                     }
-
                 }
             }
 
@@ -441,7 +454,6 @@ namespace GameServer.Battle
                     Log.InfoFormat($"Skill[{this.Define.Name}].UpdateSkill Finish");
                 }
             }
-
         }
 
         private void UpdateCD()

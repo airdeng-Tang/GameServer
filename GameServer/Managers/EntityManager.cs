@@ -1,5 +1,7 @@
 ﻿using Common;
+using GameServer.Core;
 using GameServer.Entities;
+using SkillBridge.Message;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +54,43 @@ namespace GameServer.Managers
         public Creature GetCreature(int entityId)
         {
             return GetEntity(entityId) as Creature; 
+        }
+
+        /// <summary>
+        /// 查找地图中某一类别的对象 ( 玩家 Character , 怪物 Monster 等)
+        /// </summary>
+        /// <typeparam name="T"> 继承自Creature类的对象 </typeparam>
+        /// <param name="mapId"> 地图ID </param>
+        /// <param name="match"> 可自定义的条件函数(返回值为bool类型) </param>
+        /// <returns></returns>
+        public List<T> GetMapEntities<T>(int mapId, Predicate<Entity> match) where T : Creature
+        {
+            List<T> result = new List<T>();
+            foreach(var entity in this.MapEntities[mapId])
+            {
+                if(entity is T && match.Invoke(entity))
+                {
+                    result.Add((T)entity);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 查询地图中进入aoe技能释放范围的对象(调用EntityManager.GetMapEntities方法)
+        /// </summary>
+        /// <typeparam name="T"> 继承自Creature类的对象 </typeparam>
+        /// <param name="mapId"> 地图ID </param>
+        /// <param name="pos"> aoe释放中心的坐标 </param>
+        /// <param name="range"> aoe范围半径 </param>
+        /// <returns></returns>
+        public List<T> GetMapEntitiesInRange<T>(int mapId, Vector3Int pos, int range) where T : Creature
+        {
+            return this.GetMapEntities<T>(mapId, (entity) =>
+            {
+                T creature = entity as T;
+                return creature.Direction(pos) < range;
+            });
         }
     }
 }

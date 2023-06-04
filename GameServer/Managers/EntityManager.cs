@@ -25,8 +25,13 @@ namespace GameServer.Managers
         public void AddEntity(int mapId , Entity entity)
         {
             //AllEntities.Add(entity);
-            //加入管理器生成唯一Id  (其他类调用时的entityId)
-            entity.EntityData.Id = ++this.idx;
+
+            if(entity.EntityData.Id == 0)
+            {
+                //加入管理器生成唯一Id  (其他类调用时的entityId)
+                entity.EntityData.Id = ++this.idx;
+            }
+
             AllEntities.Add(entity.EntityData.Id, entity);
 
             List<Entity> entities = null;

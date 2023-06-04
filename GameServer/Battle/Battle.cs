@@ -79,7 +79,10 @@ namespace GameServer.Battle
         /// <param name="unit"></param>
         public void JoinBattle(Creature unit)
         {
-            this.AllUnits[unit.entityId] = unit;
+            if (!this.AllUnits.ContainsKey(unit.entityId))
+            {
+                this.AllUnits[unit.entityId] = unit;
+            }
         }
 
         public void LeaveBattle(Creature unit)

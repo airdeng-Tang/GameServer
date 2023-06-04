@@ -79,6 +79,11 @@ namespace GameServer.Models
             character.Info.mapId = this.ID;
             this.MapCharacters[character.Id] = new MapCharacter(conn, character);
 
+            if (!EntityManager.Instance.MapEntities[this.ID].Contains(character))
+            {
+                EntityManager.Instance.AddEntity(this.ID, character);
+            }
+
             //NetMessage message = new NetMessage();
             //message.Response = new NetMessageResponse();
 
@@ -116,6 +121,12 @@ namespace GameServer.Models
                 this.SendCharacterLeaveMap(kv.Value.connection, cha);
             }
             this.MapCharacters.Remove(cha.Id);
+
+            if (EntityManager.Instance.MapEntities[this.ID].Contains(cha))
+            {
+                EntityManager.Instance.RemoveEntity(this.ID, cha);
+            }
+
             Log.InfoFormat("退出  {0}  后玩家总数为:  {1}",cha.Id, this.MapCharacters.Count());
         }
 

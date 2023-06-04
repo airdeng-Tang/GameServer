@@ -71,8 +71,10 @@ namespace GameServer.Services
             TeleporterDefine target = DataManager.Instance.Teleporters[source.LinkTo];
 
             MapManager.Instance[source.MapID].CharacterLeave(character);
+            EntityManager.Instance.RemoveEntity(source.MapID, character);
             character.Position = target.Position;
             character.DirectionEntity = target.Direction;
+            EntityManager.Instance.AddEntity(target.MapID, character);
             MapManager.Instance[target.MapID].CharacterEnter(sender, character);
         }
     }

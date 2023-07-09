@@ -145,7 +145,7 @@ namespace GameServer.Battle
                 this.Context = context;
                 this.Bullets.Clear();
 
-                this.AddBuff(TriggerType.SkillCast);
+                this.AddBuff(TriggerType.SkillCast, this.Context.Target);
 
                 if (this.Instant)
                 {
@@ -286,11 +286,11 @@ namespace GameServer.Battle
             target.DoDamage(damage);
             HitInfo.Damages.Add(damage);
 
-            this.AddBuff(TriggerType.SkillHit);
+            this.AddBuff(TriggerType.SkillHit, target);
         }
 
 
-        private void AddBuff(TriggerType trigger)
+        private void AddBuff(TriggerType trigger, Creature target)
         {
             if (this.Define.Buff == null || this.Define.Buff.Count == 0)
             {
@@ -312,7 +312,7 @@ namespace GameServer.Battle
                 }
                 else if(buffDefine.Target == TargetType.Target)
                 {
-                    this.Context.Target.AddBuff(this.Context, buffDefine);
+                    target.AddBuff(this.Context, buffDefine);
                 }
             }
         }

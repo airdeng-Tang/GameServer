@@ -1,10 +1,12 @@
-﻿using GameServer.Core;
+﻿using Common;
+using GameServer.Core;
 using GameServer.Entities;
 using GameServer.Managers;
 using GameServer.Models;
 using Network;
 using SkillBridge.Message;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
@@ -20,7 +22,7 @@ namespace GameServer.Battle
         /// <summary>
         /// 所有参加战斗的单位
         /// </summary>
-        Dictionary<int, Creature> AllUnits = new Dictionary<int, Creature>();
+        ConcurrentDictionary<int, Creature> AllUnits = new ConcurrentDictionary<int, Creature>();
 
         Queue<NSkillCastInfo> Actions = new Queue<NSkillCastInfo>();
 
@@ -87,7 +89,11 @@ namespace GameServer.Battle
 
         public void LeaveBattle(Creature unit)
         {
-            this.AllUnits.Remove(unit.entityId);
+            bool tryRemove = this.AllUnits.TryRemove(unit.entityId, out Creature c);
+            if (tryRemove)
+            {
+                Log.InfoFormat($"对象 :: {c.Name} -- 退出战斗");
+            }
         }
 
         /// <summary>
@@ -152,7 +158,7 @@ namespace GameServer.Battle
         void UpdateUnits()
         {
             this.DeahPool.Clear();
-            foreach(var kv in this.AllUnits)//集合类不能在遍历是做增删操作
+            foreach(var kv in this.AllUnits)//集合类不能在遍历时做增删操作
             {
                 kv.Value.Update();
                 if (kv.Value.IsDeath)

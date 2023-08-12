@@ -67,7 +67,7 @@ namespace GameServer.Battle
             Log.InfoFormat(
                 $"Buff[{this.Define.Name}].DoBuffDamage[{this.owner.Name}] ::" +
                 $" (Buff伤害)Damage:{damage.Damage} (是否暴击)Crit:{damage.Crit}");
-            this.owner.DoDamage(damage);
+            this.owner.DoDamage(damage, Context.Caster);
 
             NBuffInfo buff = new NBuffInfo()
             {

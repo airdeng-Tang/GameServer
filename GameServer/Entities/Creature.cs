@@ -44,6 +44,11 @@ namespace GameServer.Entities
 
         public bool IsDeath = false;
 
+        /// <summary>
+        /// 怪物状态
+        /// </summary>
+        public CharState State;
+
         public Creature(Vector3Int pos, Vector3Int dir):base(pos,dir)
         {
             
@@ -93,21 +98,50 @@ namespace GameServer.Entities
             Skill skill = this.SkillMgr.GetSkill(skillId);
 
             context.Result = skill.Cast(context);
+            if(context.Result == SkillResult.Ok)
+            {
+                this.State = CharState.InBattle;
+            }
+
+            if(context.CastSkill == null)//为空时表示是怪物释放的技能
+            {
+                if(context.Result == SkillResult.Ok)
+                {
+                    context.CastSkill = new NSkillCastInfo()
+                    {
+                        casterId = this.entityId,
+                        targetId = context.Target.entityId,
+                        skillId = skill.Define.ID,
+                        Position = new NVector3(),
+                        Result = context.Result,
+                    };
+                    context.Battle.AddCastSkillInfo(context.CastSkill);
+                }
+            }
+            else
+            {
+                context.CastSkill.Result = context.Result;
+                context.Battle.AddCastSkillInfo(context.CastSkill);
+            }
         }
-        
+
         /// <summary>
         /// 角色受技能影响的效果
         /// </summary>
-        /// <param name="damage"></param>
+        /// <param name="damage">伤害数据</param>
+        /// <param name="source">伤害来源</param>
         /// <exception cref="NotImplementedException"></exception>
-        internal void DoDamage(NDamageInfo damage)
+        internal void DoDamage(NDamageInfo damage, Creature source)
         {
+            this.State = CharState.InBattle;
             this.Attributes.HP -= damage.Damage;
             if(this.Attributes.HP < 0)
             {
                 this.IsDeath = true;
                 damage.WillDead = true;
             }
+
+            this.OnDamage(damage, source);
         }
 
         public override void Update()
@@ -142,5 +176,16 @@ namespace GameServer.Entities
         {
             this.BuffMgr.AddBuff(context, buffDefine);
         }
+
+        /// <summary>
+        /// 造成伤害的来源
+        /// </summary>
+        /// <param name="damage">伤害信息</param>
+        /// <param name="source">伤害来源</param>
+        protected virtual void OnDamage(NDamageInfo damage, Creature source)
+        {
+            
+        }
+
     }
 }

@@ -174,7 +174,10 @@ namespace GameServer.Models
         //    }
         //}
 
-
+        /// <summary>
+        /// 同步实体运动状态和坐标
+        /// </summary>
+        /// <param name="entity"></param>
         internal void UpdateEntity(NEntitySync entity)
         {
             foreach(var kv in this.MapCharacters)

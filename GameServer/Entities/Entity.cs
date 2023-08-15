@@ -27,7 +27,10 @@ namespace GameServer.Entities
             }
         }
 
-        private Vector3Int direction;
+        /// <summary>
+        /// 对象实体的朝向(面对方向)
+        /// </summary>
+        public Vector3Int direction;
         public Vector3Int DirectionEntity
         {
             get { return direction; }
@@ -50,6 +53,10 @@ namespace GameServer.Entities
         }
 
         private NEntity entityData;
+
+        /// <summary>
+        /// 实体的位置坐标方向信息
+        /// </summary>
         public NEntity EntityData
         {
             get

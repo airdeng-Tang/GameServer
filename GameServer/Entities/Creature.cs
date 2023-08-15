@@ -45,9 +45,14 @@ namespace GameServer.Entities
         public bool IsDeath = false;
 
         /// <summary>
-        /// 怪物状态
+        /// 怪物战斗状态
         /// </summary>
-        public CharState State;
+        public BattleState BattleState;
+
+        /// <summary>
+        /// 运动状态
+        /// </summary>
+        public CharacterState State;
 
         public Creature(Vector3Int pos, Vector3Int dir):base(pos,dir)
         {
@@ -100,7 +105,7 @@ namespace GameServer.Entities
             context.Result = skill.Cast(context);
             if(context.Result == SkillResult.Ok)
             {
-                this.State = CharState.InBattle;
+                this.BattleState = BattleState.InBattle;
             }
 
             if(context.CastSkill == null)//为空时表示是怪物释放的技能
@@ -133,7 +138,7 @@ namespace GameServer.Entities
         /// <exception cref="NotImplementedException"></exception>
         internal void DoDamage(NDamageInfo damage, Creature source)
         {
-            this.State = CharState.InBattle;
+            this.BattleState = BattleState.InBattle;
             this.Attributes.HP -= damage.Damage;
             if(this.Attributes.HP < 0)
             {
